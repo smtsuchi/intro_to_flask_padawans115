@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Home Page</h1>
+
+{{ pop }}
+
+{% for p in pop %}
+    {% if p == 'Sarah' %}
+        <li style="font-weight:800">
+            {{ p }}
+        </li>
+    {% else %}
+        <li>{{ p }}</li>
+    {% endif %}
+{% endfor %}
+
+<p>hi </p>
+
+
+{{ more }}
+
+{% endblock %}
