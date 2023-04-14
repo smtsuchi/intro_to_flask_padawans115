@@ -2,15 +2,19 @@
 
 {% block content %}
 <h1>All Posts</h1>
-    {% for p in posts %}
-        <div class="card" style="width: 18rem;">
-            <img src="{{ p.img_url }}" class="card-img-top" alt="...">
-            <div class="card-body">
-            <h5 class="card-title">{{ p.title }} - {{ p.author.username }}</h5>
-            <p class="card-text">{{ p.caption }}</p>
-            </div>
-        </div>
-    {% endfor %}
+<div class="row">
+    <div class="justify-content-center">
+            {% for p in posts %}
+                <a class="card text-decoration-none text-dark " style="width: 18rem;" href="{{ url_for('showPost', post_id=p.id) }}">
+                    <img src="{{ p.img_url }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                    <h5 class="card-title">{{ p.title }} - {{ p.author.username }}</h5>
+                    <p class="card-text">{{ p.caption }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+    </div>
+</div>
 
 
 

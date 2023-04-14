@@ -1,6 +1,6 @@
-from flask import redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for
 from app import app
-from .forms import LoginForm, PostForm, SignUpForm
+from .forms import PostForm
 from .models import Post, User
 from flask_login import  current_user, login_user, logout_user, login_required
 
@@ -14,56 +14,6 @@ def homePage():
 
     return render_template('index.html', pop=people, more=more)
 
-@app.route('/signup', methods=["GET", "POST"])
-def signupPage():
-    form = SignUpForm()
-    
-    if request.method == 'POST':
-        if form.validate():
-            username = form.username.data
-            email = form.email.data
-            password = form.password.data
-
-            # add user to database
-            # if User exists:
-            #     print(error msg)
-            # else:
-            user = User(username, email, password)
-        
-            user.saveToDB()
-            account = {
-                'username': username,
-                'email': email
-            }
-        return render_template('signup.html', form = form, account=account)
-    return render_template('signup.html', form = form)
-
-@app.route('/login', methods=["GET", "POST"])
-def loginPage():
-    form = LoginForm()
-    if request.method == "POST":
-        if form.validate():
-            username = form.username.data
-            password = form.password.data
-
-            user = User.query.filter_by(username=username).first()            
-            if user:
-                # verify password
-                if user.password == password:
-                    login_user(user)
-                    return redirect(url_for('homePage'))
-                else:
-                    print('invalid password')
-            else:
-                print('incorrect username or password')
-
-
-    return render_template('login.html', form = form)
-
-@app.route('/logout')
-def logMeOut():
-    logout_user()
-    return redirect(url_for('loginPage'))
 
 
 @app.route('/posts/create', methods=['GET', "POST"])
@@ -88,3 +38,54 @@ def createPost():
 def showAllPosts():
     posts = Post.query.all()
     return render_template('posts.html', posts = posts)
+
+@app.route('/posts/<int:post_id>')
+def showPost(post_id):
+    post = Post.query.get(post_id)
+    if post:
+        return render_template('singlepost.html', post = post)
+    else:
+        return redirect(url_for('showAllPosts'))
+    
+@app.route('/posts/delete/<int:post_id>')
+@login_required
+def deletePost(post_id):
+    post = Post.query.get(post_id)
+    if post:
+        if post.user_id == current_user.id:
+            post.deleteFromDB()
+        else:
+            flash("You cannot delete another user's post.", 'danger')
+    else:
+        flash("The post you are trying to delete does not exist.", 'danger')
+    return redirect(url_for('showAllPosts'))
+
+
+@app.route('/posts/update/<int:post_id>', methods = ['GET', 'POST'])
+@login_required
+def updatePost(post_id):
+    post = Post.query.get(post_id)
+    if post:
+        if post.user_id == current_user.id:
+            form = PostForm()
+            if request.method == "POST":
+                if form.validate():
+                    title = form.title.data
+                    img_url = form.img_url.data
+                    caption = form.caption.data
+                    
+                    post.title = title
+                    post.img_url = img_url
+                    post.caption = caption
+
+                    post.saveChangesToDB()
+                    flash('Succesfully updated your post!', 'success')
+                    return redirect(url_for('showPost', post_id=post.id))
+                    
+            return render_template('updatepost.html', form = form, post = post)
+        else:
+            flash("You cannot update another user's post.", 'danger')
+    else:
+        flash('The post you are trying to update does not exist', 'danger')
+    return redirect(url_for('showAllPosts'))
+

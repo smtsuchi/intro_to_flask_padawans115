@@ -38,3 +38,10 @@ class Post(db.Model):
     def saveToDB(self):
         db.session.add(self)
         db.session.commit()
+
+    def deleteFromDB(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def saveChangesToDB(self):
+        db.session.commit()
