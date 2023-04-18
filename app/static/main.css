@@ -1,6 +1,8 @@
 footer {
     width: 100%;
     background-color: lightblue;
-    position: absolute;
     bottom: 0;
+}
+.my-heart{
+    color: tomato;
 }

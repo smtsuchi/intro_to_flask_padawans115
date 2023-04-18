@@ -3,21 +3,24 @@
 {% block content %}
 <h1>Home Page</h1>
 
-{{ pop }}
+{% if current_user.is_authenticated %}
+    <ul class="list-group">
+    {% for u in users %}
+            {% if u.id != current_user.id %}
+                <li class="list-group-item">
+                    {{ u.username }}
+                    {% if u in current_user.followed.all() %}
+                        <a class='btn btn-danger' href="{{ url_for('unfollowUser', user_id=u.id) }}">Unfollow</a>
+                    {% else %}
+                        <a class='btn btn-primary' href="{{ url_for('followUser', user_id=u.id) }}">Follow</a>
+                    {% endif %}
+                </li>
+            {% endif %}
+            {% endfor %}
+    </ul>
+{% else %}
+    <h2>Log in to see the other users.</h2>
+{% endif %}
 
-{% for p in pop %}
-    {% if p == 'Sarah' %}
-        <li style="font-weight:800">
-            {{ p }}
-        </li>
-    {% else %}
-        <li>{{ p }}</li>
-    {% endif %}
-{% endfor %}
-
-<p>hi </p>
-
-
-{{ more }}
 
 {% endblock %}

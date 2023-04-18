@@ -1,18 +1,15 @@
 from flask import flash, redirect, render_template, request, url_for
 from app import app
 from .forms import PostForm
-from .models import Post, User
+from .models import Like, Post, User
 from flask_login import  current_user, login_user, logout_user, login_required
 
 @app.route('/')
 def homePage():
-    people = ['Shoha', 'Sarah', 'Aubrey', "Nicole"]
+    users = User.query.all()
+    
 
-    more = {
-        'hello': 'world'
-    }
-
-    return render_template('index.html', pop=people, more=more)
+    return render_template('index.html', users=users)
 
 
 
@@ -36,7 +33,7 @@ def createPost():
 
 @app.route('/posts')
 def showAllPosts():
-    posts = Post.query.all()
+    posts = Post.query.order_by(Post.date_created.desc()).all()
     return render_template('posts.html', posts = posts)
 
 @app.route('/posts/<int:post_id>')
@@ -89,3 +86,33 @@ def updatePost(post_id):
         flash('The post you are trying to update does not exist', 'danger')
     return redirect(url_for('showAllPosts'))
 
+@app.route('/posts/like/<int:post_id>')
+@login_required
+def likePost(post_id):
+    like = Like(current_user.id, post_id)
+    like.saveToDB() 
+    return redirect(url_for('showAllPosts'))
+
+@app.route('/posts/unlike/<int:post_id>')
+@login_required
+def unlikePost(post_id):
+    like = Like.query.filter_by(post_id=post_id).first()
+    if like:
+        like.deleteFromDB()
+    return redirect(url_for('showAllPosts'))
+
+@app.route('/follow/<int:user_id>')
+@login_required
+def followUser(user_id):
+    user = User.query.get(user_id)
+    if user:
+        current_user.follow(user)
+    return redirect(url_for('homePage'))
+
+@app.route('/unfollow/<int:user_id>')
+@login_required
+def unfollowUser(user_id):
+    user = User.query.get(user_id)
+    if user:
+        current_user.unfollow(user)
+    return redirect(url_for('homePage'))

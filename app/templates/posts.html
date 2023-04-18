@@ -10,8 +10,20 @@
                     <div class="card-body">
                     <h5 class="card-title">{{ p.title }} - {{ p.author.username }}</h5>
                     <p class="card-text">{{ p.caption }}</p>
+                    <p class="card-text"><small class="text-body-secondary">Posted {{ moment(p.date_created).fromNow() }}</small></p>
                     </div>
                 </a>
+                {% if current_user.is_authenticated %}
+                    {% if current_user in p.likers %}
+                        <a href='{{ url_for("unlikePost", post_id=p.id)  }}' class="text-decoration-none my-heart material-symbols-outlined" style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48">
+                            favorite
+                            </a>
+                        {% else %}
+                        <a href='{{ url_for("likePost", post_id=p.id) }}' class="text-decoration-none my-heart material-symbols-outlined">
+                            favorite
+                            </a>
+                    {% endif %}
+                {% endif %}
             {% endfor %}
     </div>
 </div>
