@@ -116,3 +116,17 @@ def unfollowUser(user_id):
     if user:
         current_user.unfollow(user)
     return redirect(url_for('homePage'))
+
+import requests as r
+import os
+NEWS_API_KEY = os.environ.get('NEWS_API_KEY')
+
+@app.route('/news')
+def newsPage():
+    url = f'https://newsapi.org/v2/everything?q=bitcoin&apiKey={ NEWS_API_KEY }&pageSize=20'
+    response = r.get(url)
+    data = response.json()
+    articles = []
+    if data['status'] == 'ok':
+        articles = data['articles']
+    return render_template('news.html', articles=articles)

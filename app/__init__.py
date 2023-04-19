@@ -4,6 +4,7 @@ from .models import db, User
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from .auth.routes import auth
+from .api import api
 from flask_moment import Moment
 
 app = Flask(__name__)
@@ -22,6 +23,7 @@ login_manager.login_view = 'auth.loginPage'
 
 ## register your blueprints
 app.register_blueprint(auth)
+app.register_blueprint(api)
 
 
 from . import routes

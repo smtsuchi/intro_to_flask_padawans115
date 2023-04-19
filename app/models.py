@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
 
@@ -32,7 +33,7 @@ class User(db.Model, UserMixin):
     def __init__(self, username, email, password):
         self.username = username
         self.email = email
-        self.password = password
+        self.password = generate_password_hash(password)
 
     def saveToDB(self):
         db.session.add(self)
@@ -71,6 +72,17 @@ class Post(db.Model):
 
     def saveChangesToDB(self):
         db.session.commit()
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'caption': self.caption,
+            'img_url': self.img_url,
+            'author': self.author.username,
+            'likes': len(self.likers),
+            'date_created': self.date_created,
+        }
 
 likes = db.Table('like_2',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable = False),

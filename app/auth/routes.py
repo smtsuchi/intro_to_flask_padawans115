@@ -2,6 +2,7 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from .forms import LoginForm, SignUpForm
 from ..models import User
 from flask_login import  login_user, logout_user, login_required
+from werkzeug.security import check_password_hash
 
 auth = Blueprint('auth', __name__, template_folder='auth_templates')
 
@@ -44,7 +45,7 @@ def loginPage():
             user = User.query.filter_by(username=username).first()            
             if user:
                 # verify password
-                if user.password == password:
+                if check_password_hash(user.password, password):
                     login_user(user)
                     return redirect(url_for('homePage'))
                 else:
