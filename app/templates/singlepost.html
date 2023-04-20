@@ -13,7 +13,7 @@
 </div>
 {% if current_user.is_authenticated %}
     {% if post.user_id == current_user.id %}
-        <a href="{{ url_for('updatePost', post_id=post.id) }}" class="btn btn-primary">Update</a>
+        <a href="{{ url_for('ig.updatePost', post_id=post.id) }}" class="btn btn-primary">Update</a>
         <!-- Button trigger modal -->
         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
             Delete
@@ -32,7 +32,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <a type="button" class="btn btn-danger" href="{{ url_for('deletePost', post_id=post.id) }}">Delete</a>
+                        <a type="button" class="btn btn-danger" href="{{ url_for('ig.deletePost', post_id=post.id) }}">Delete</a>
                     </div>
                 </div>
             </div>

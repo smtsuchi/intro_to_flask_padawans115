@@ -5,15 +5,17 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from .auth.routes import auth
 from .api import api
+from .ig import ig
 from flask_moment import Moment
 
-app = Flask(__name__)
-app.config.from_object(Config)
 
-db.init_app(app)
-migrate = Migrate(app,db)
-login_manager = LoginManager(app)
-moment = Moment(app)
+
+
+
+
+migrate = Migrate()
+login_manager = LoginManager()
+moment = Moment()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -21,10 +23,18 @@ def load_user(user_id):
 
 login_manager.login_view = 'auth.loginPage'
 
-## register your blueprints
-app.register_blueprint(auth)
-app.register_blueprint(api)
 
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
 
-from . import routes
-from . import models
+    db.init_app(app)
+    migrate.init_app(app,db)
+    login_manager.init_app(app)
+    moment.init_app(app)
+
+    app.register_blueprint(auth)
+    app.register_blueprint(api)
+    app.register_blueprint(ig)
+
+    return app
