@@ -6,7 +6,7 @@ from flask import abort
 def getPostsAPI():
     posts = Post.query.all()
     return {
-        'status':' ok',
+        'status':'ok',
         'results': len(posts),
         'posts': [p.to_dict() for p in posts]
     }
@@ -16,7 +16,7 @@ def getPostAPI(post_id):
     post = Post.query.get(post_id)
     if post:
         return {
-            'status':' ok',
+            'status':'ok',
             'results': 1,
             'post': post.to_dict()
         }
