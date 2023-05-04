@@ -1,9 +1,9 @@
 from . import api
 from ..models import Post
-from flask import abort 
+
 
 @api.get('/posts')
-def getPostsAPI():
+def getPostsAPI(): 
     posts = Post.query.all()
     return {
         'status':'ok',
@@ -12,7 +12,7 @@ def getPostsAPI():
     }
 
 @api.get('/posts/<int:post_id>')
-def getPostAPI(post_id):
+def getPostAPI( post_id):
     post = Post.query.get(post_id)
     if post:
         return {

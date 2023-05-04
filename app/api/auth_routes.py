@@ -1,6 +1,8 @@
 from . import api
 from ..models import User
 from flask import request
+from werkzeug.security import check_password_hash
+from ..apiauthhelper import basic_auth
 
 @api.post('/signup')
 def signUpAPI():
@@ -31,3 +33,11 @@ def signUpAPI():
     }, 201
 
 
+@api.post('/login')
+@basic_auth.login_required
+def loginAPI():
+    return {
+        'status': 'ok',
+        'message': "You have successfully logged in.",
+        'data': basic_auth.current_user().to_dict()
+    }, 200

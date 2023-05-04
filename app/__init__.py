@@ -7,15 +7,14 @@ from .auth.routes import auth
 from .api import api
 from .ig import ig
 from flask_moment import Moment
-
-
-
-
+from flask_cors import CORS
 
 
 migrate = Migrate()
 login_manager = LoginManager()
 moment = Moment()
+# cors = CORS(origins=['http://shoha.com', ''])
+cors = CORS()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -32,6 +31,7 @@ def create_app(config_class=Config):
     migrate.init_app(app,db)
     login_manager.init_app(app)
     moment.init_app(app)
+    cors.init_app(app)
 
     app.register_blueprint(auth)
     app.register_blueprint(api)

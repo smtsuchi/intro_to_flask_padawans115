@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash
+from secrets import token_hex
 
 db = SQLAlchemy()
 
@@ -27,6 +28,7 @@ class User(db.Model, UserMixin):
         primaryjoin = (followers.c.follower_id == id),
         secondaryjoin = (followers.c.followed_id == id)
         )
+    apitoken = db.Column(db.String, unique=True)
     
 
 
@@ -34,6 +36,15 @@ class User(db.Model, UserMixin):
         self.username = username
         self.email = email
         self.password = generate_password_hash(password)
+        self.apitoken = token_hex(16)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'apitoken': self.apitoken
+        }
 
     def saveToDB(self):
         db.session.add(self)
