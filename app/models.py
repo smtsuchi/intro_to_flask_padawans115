@@ -19,6 +19,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String, nullable = False)
     date_created = db.Column(db.DateTime, nullable = False, default=datetime.utcnow())
     post = db.relationship('Post', backref = 'author', lazy = True)
+    cart = db.relationship('Product', secondary='cart', backref = 'shoppers', lazy = True)
     liked_posts = db.relationship('Post', secondary='like', lazy = True)
     followed = db.relationship(
         'User',
@@ -133,3 +134,52 @@ class Like(db.Model):
 
 # post = Post.query.get(1) # return to us a post object with ID 1
 # post.likers.all() # return to us all the people that liked post 1
+
+
+class Product(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    product_name = db.Column(db.String(100), nullable = False)
+    img_url = db.Column(db.String, nullable = False)
+    description = db.Column(db.String(500))
+    price = db.Column(db.Numeric(10,2))
+
+    def __init__(self, product_name, img_url, description, price):
+        self.product_name = product_name
+        self.img_url = img_url
+        self.description = description
+        self.price = price
+
+    def saveToDB(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def deleteFromDB(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def saveChangesToDB(self):
+        db.session.commit()
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'product_name': self.product_name,
+            'description': self.description,
+            'img_url': self.img_url,
+            'price': self.price,
+        }
+    
+class Cart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable = False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete='CASCADE'), nullable = False)
+
+    def __init__(self, user_id, product_id):
+        self.user_id = user_id
+        self.product_id = product_id
+    def saveToDB(self):
+        db.session.add(self)
+        db.session.commit()
+    def deleteFromDB(self):
+        db.session.delete(self)
+        db.session.commit()

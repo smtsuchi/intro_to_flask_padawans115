@@ -85,3 +85,27 @@ def updatePostAPI(post_id):
                 'status': 'not ok',
                 'message': 'The post you are trying to update does not exist'
             }
+    
+@api.delete('/posts/delete/<int:post_id>')
+@token_auth.login_required
+def deletePostAPI(post_id):
+    post = Post.query.get(post_id)
+    if post:
+        if post.user_id == token_auth.current_user().id:
+            post.deleteFromDB()
+            return {
+                'status': 'ok',
+                'message': 'Successfully deleted the post.'
+            }
+        else:
+            return {
+                'status': 'not ok',
+                'message': 'You cannot delete another Users post.'
+            }, 400
+    else:
+        return {
+                'status': 'not ok',
+                'message': 'The posts you are trying to delete does not exist.'
+            }, 404
+
+
