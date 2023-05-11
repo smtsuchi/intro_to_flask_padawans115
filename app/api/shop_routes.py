@@ -1,8 +1,11 @@
 from . import api
 from ..models import Product, Cart
 from ..apiauthhelper import token_auth
-from flask import request
+from flask import request, redirect
+import stripe
+import os
 
+FRONT_END_URL = os.environ.get('FRONT_END_URL')
 
 @api.get('/products')
 def getProductsAPI(): 
@@ -62,3 +65,39 @@ def removeFromCartAPI(product_id):
             'status': 'not ok',
             'message': f"You do not have that item in your cart."
         }
+
+stripe.api_key = os.environ.get('STRIPE_API_KEY')
+
+
+
+
+@api.post('/checkout')
+def checkout():
+    try:
+        data = request.form
+        line_items = []
+        for price, qty in data.items():
+            line_items.append({
+                'price': price,
+                'quantity': qty
+            })
+        checkout_session = stripe.checkout.Session.create(
+            # line_items=line_items,
+            line_items=[{
+                "price_data": {
+                    "currency": "usd",
+                    "product_data": {"name": "Lifetime Subscription to Shoha Fans"},
+                    "unit_amount": 2000,
+                    "tax_behavior": "exclusive",
+                },
+                'quantity':3
+            }],
+            mode='payment',
+            success_url=FRONT_END_URL + '?success=true',
+            cancel_url=FRONT_END_URL + '?canceled=true',
+            customer={'email':'shohat@codingtemple.com'}
+        )
+    except Exception as e:
+        return str(e)
+
+    return redirect(checkout_session.url, code=303)
