@@ -95,7 +95,6 @@ def checkout():
             mode='payment',
             success_url=FRONT_END_URL + '?success=true',
             cancel_url=FRONT_END_URL + '?canceled=true',
-            customer={'email':'shohat@codingtemple.com'}
         )
     except Exception as e:
         return str(e)
