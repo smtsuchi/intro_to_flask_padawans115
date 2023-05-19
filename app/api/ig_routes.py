@@ -1,6 +1,6 @@
 from . import api
 from ..models import Post
-from ..apiauthhelper import token_auth
+from ..apiauthhelper import token_auth, token_auth_required
 from flask import request
 
 
@@ -29,24 +29,30 @@ def getPostAPI( post_id):
         }, 404
 
 @api.post('/posts/create')
-@token_auth.login_required
-def createPostAPI():
-    data = request.json
-    
-    title = data['title']
-    img_url = data['img_url']
-    caption = data['caption']
+@token_auth_required
+def createPostAPI(user):
+    try:
+        data = request.json
+        
+        title = data['title']
+        img_url = data['img_url']
+        caption = data['caption']
 
-    post = Post(title, img_url, caption, token_auth.current_user().id)
+        post = Post(title, img_url, caption, user.id)
 
-    post.saveToDB()
+        post.saveToDB()
 
-            
-    return {
-        'status': 'ok',
-        'message': 'Succesfully created a post.',
-        'post': post.to_dict()
-    }, 201
+                
+        return {
+            'status': 'ok',
+            'message': 'Successfully created a post.',
+            'post': post.to_dict()
+        }, 201
+    except:
+        return {
+            'status': 'not ok',
+            'message': 'Not enough info provided to create a post.'
+        }, 400
 
 @api.post('/posts/update/<int:post_id>')
 @token_auth.login_required

@@ -5,8 +5,6 @@ from app import create_app, db
 from test_config import Config
 
 class FlaskTest(unittest.TestCase):
-    base_url = 'http://127.0.0.1:5000/api' # deployed development branch (separate from your production deployment)
-
     def setUp(self):
         self.app = create_app(Config)
         self.app_context = self.app.app_context()

@@ -71,12 +71,12 @@ def token_auth_required(func):
                 return {
                     'status': 'not ok',
                     'message': "Please use Token Authentication (Bearer Token)"
-                }
+                }, 401
         else:
             return {
                 'status': 'not ok',
                 'message': "Please include the header Authorization with Token Auth using a Bearer Token"
-            }
+            }, 401
         user = User.query.filter_by(apitoken=token).first()
         if user:
             return func(user=user, *arg, **kwargs)
@@ -84,6 +84,6 @@ def token_auth_required(func):
             return {
                 'status': 'not ok',
                 'message': "That token does not belong to a valid user."
-            }
+            }, 401
     decorated.__name__ = func.__name__
     return decorated
